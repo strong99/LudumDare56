@@ -1,0 +1,31 @@
+{
+  "intro": [
+    {
+      "scene": "default",
+      "narrator": "strong99 (developer)",
+      "html": "<p>Welcome to The Plaguers</p><p>This game is build for <a href=\"https://ldjam.com/events/ludum-dare/56/\" target=\"_new\">LD56</a>. It's a tower defence like game and it's your goal to defend against swarms of tiny creatures.</p><p><a href=\"https://ldjam.com/events/ludum-dare/56/the-plaguers\" target=\"_new\">You can rate the game on LDJam</a></p>"
+    },
+    {
+      "narrator": "a townsman",
+      "scene": "default",
+      "text": "It's not a week ago that the sky darkend, cold air blew in and critters crawled from the ground."
+    },
+    {
+      "narrator": "a townsman",
+      "scene": "default",
+      "text": "It brought illness and plagues. An invasion. But with the help of you, we devised demonic firey machines."
+    }
+  ],
+  "outro": [
+    {
+      "narrator": "a townsman",
+      "scene": "default",
+      "text": "Not even YOU could keep darkness at bay. I'm the last. And all that was left for me..."
+    },
+    {
+      "narrator": "a townsman",
+      "scene": "default",
+      "text": "was to set FIRE, to all"
+    }
+  ]
+}

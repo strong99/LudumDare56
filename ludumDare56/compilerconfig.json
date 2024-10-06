@@ -1,0 +1,7 @@
+﻿[
+  {
+    "outputFile": "src/style.css",
+    "inputFile": "src/style.less",
+    "minify": { "enabled": false }
+  }
+]

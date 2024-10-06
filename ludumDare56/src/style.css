@@ -1,0 +1,499 @@
+﻿:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100dvh;
+  min-width: 100dvw;
+}
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-height: 100dvh;
+  min-width: 100dvw;
+}
+a,
+button {
+  cursor: pointer;
+}
+fieldset {
+  display: flex;
+  flex-direction: column;
+}
+fieldset > label {
+  display: flex;
+  flex-direction: row;
+}
+fieldset > label > span {
+  min-width: 7em;
+}
+.page-fragment {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  width: 100dvw;
+  position: relative;
+}
+.circle-menu {
+  background: none;
+  border: none;
+  position: absolute;
+  overflow: visible;
+  margin: 0;
+  padding: 0;
+}
+.circle-menu > li {
+  display: flex;
+  list-style: none;
+  position: absolute;
+  left: calc(cos(var(--index) * (360deg / var(--max))) * 6em);
+  top: calc(sin(var(--index) * (360deg / var(--max))) * 6em);
+  width: 5em;
+  height: 5em;
+  box-sizing: border-box;
+  padding: 0;
+  transform: translate(-50%, -50%);
+}
+.circle-menu > li button {
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  padding: 0.25em;
+}
+.circle-menu > li button:hover {
+  background: #bbb;
+}
+ld56-play.page-fragment {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 15em;
+  width: 100dvw;
+  height: 100dvh;
+}
+ld56-play.page-fragment [name="btn-menu"] {
+  padding: 0.5em;
+  width: 2.5em;
+  height: 2.5em;
+}
+ld56-play.page-fragment [name="btn-menu"]:before {
+  content: '\2261';
+}
+ld56-play.page-fragment [name="btn-menu"] > span {
+  display: none;
+}
+ld56-play.page-fragment .widget.layer {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+ld56-play.page-fragment .widget.layer > li.active {
+  filter: invert();
+}
+ld56-play.page-fragment .widget.layer > li > button:before {
+  content: "\2750";
+  margin-right: 0.5em;
+}
+ld56-play.page-fragment > menu {
+  position: absolute;
+  right: 1em;
+  top: 1em;
+  z-index: 999;
+}
+ld56-play.page-fragment > ul.widget.layer {
+  position: absolute;
+  left: 1em;
+  top: 1em;
+  z-index: 999;
+}
+ld56-play.page-fragment > .canvas-wrapper {
+  overflow: hidden;
+}
+ld56-play.page-fragment > * {
+  position: relative;
+}
+ld56-play.page-fragment > div.buildmenu {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  height: 15em;
+  width: 100%;
+  place-self: start center;
+  place-content: space-between;
+  border-top: 16px solid;
+  border-bottom: 16px solid;
+  border-image: url(../public/assets/borders-copper.png) 16 round;
+  box-sizing: border-box;
+}
+ld56-play.page-fragment > div.buildmenu > menu {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  border-left: 16px solid;
+  border-right: 16px solid;
+  border-image: url(../public/assets/borders-copper.png) 16 round;
+  box-sizing: border-box;
+}
+ld56-play.page-fragment > div.buildmenu > menu > div {
+  display: flex;
+  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
+}
+ld56-play.page-fragment > div.buildmenu > menu button {
+  aspect-ratio: 1/1;
+  width: 8em;
+}
+ld56-play.page-fragment > div.buildmenu > menu > h1 {
+  margin: 0;
+  width: 100%;
+  border-bottom: 8px solid;
+  border-image: url(../public/assets/borders-copper.png) 16 round;
+}
+ld56-play.page-fragment menu.stats > div {
+  text-align: left;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  padding: 0.5em;
+  gap: 0.5em;
+}
+ld56-play.page-fragment menu.stats > div > label {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5em;
+}
+ld56-play.page-fragment menu.stats > div > label > span {
+  width: 100%;
+}
+ld56-play.page-fragment menu.stats > div > label > span.value {
+  text-align: right;
+}
+ld56-play.page-fragment menu.stats > div > label > span:first-child {
+  width: 5em;
+}
+ld56-play.page-fragment menu.stats > div span.currency:before {
+  content: '\20AC';
+  margin-right: 0.25em;
+}
+.placeholder {
+  display: flex;
+  width: 3em;
+  height: 3em;
+  background-color: red;
+  position: absolute;
+  left: calc(var(--x) * 1px);
+  top: calc(var(--y) * 1px);
+  transform: translate(-50%, -50%);
+  z-index: 999;
+  pointer-events: none;
+  touch-action: none;
+}
+.placeholder.allowed {
+  background-color: green;
+}
+menu {
+  margin: 0;
+  padding: 0;
+}
+ld56-menu-layout {
+  display: flex;
+  flex-direction: row;
+  place-content: safe center;
+  place-items: safe start;
+  background-image: url(../public/assets/menu-screen.png);
+  background-size: cover;
+  background-position: center bottom;
+  z-index: 0;
+  overflow: hidden;
+}
+ld56-menu-layout:before {
+  display: block;
+  position: absolute;
+  right: 15%;
+  bottom: -10%;
+  content: '';
+  height: 80dvh;
+  aspect-ratio: 5/6;
+  background-image: url(../public/assets/menu-laddy.png);
+  background-size: cover;
+  background-position: center bottom;
+}
+ld56-menu-layout button {
+  padding: 0.5em 0.25em;
+}
+ld56-menu-layout > .page-fragment {
+  width: auto;
+  height: auto;
+  padding: 0.5em;
+  max-width: 27em;
+  gap: 0.5em;
+  border: none;
+  color: black;
+  z-index: 0;
+  background: url(../public/assets/menu-middle.png);
+  background-size: 100%;
+  width: 23.375em;
+  padding: 0 3em;
+  box-sizing: border-box;
+}
+ld56-menu-layout > .page-fragment a {
+  color: black;
+}
+ld56-menu-layout > .page-fragment a:hover {
+  font-weight: bolder;
+}
+ld56-menu-layout > .page-fragment > p {
+  margin: 0;
+}
+ld56-menu-layout > .page-fragment > ul {
+  margin: 0;
+}
+ld56-menu-layout > .page-fragment:before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% - 2.5em);
+  left: 0;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4/1;
+  background: url(../public/assets/menu-header.png) center top no-repeat;
+  background-size: contain;
+  z-index: -1;
+  pointer-events: none;
+}
+ld56-menu-layout > .page-fragment:after {
+  content: '';
+  position: absolute;
+  top: 95%;
+  left: 0;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4/1;
+  background: url(../public/assets/menu-footer.png) center top no-repeat;
+  background-size: contain;
+  z-index: -1;
+  pointer-events: none;
+}
+ld56-menu-layout > .page-fragment > * {
+  position: relative;
+}
+@media screen and (min-width: 30em) {
+  ld56-menu-layout > .page-fragment {
+    margin-left: 5em;
+  }
+}
+ld56-menu-layout > .page-fragment > header {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5em;
+  border-bottom: 1px solid black;
+  place-content: center;
+  place-items: center;
+}
+ld56-menu-layout > .page-fragment > header > h1 {
+  text-align: center;
+  margin: 0;
+}
+ld56-menu-layout > .page-fragment > header > button {
+  background: none;
+  border: none;
+  padding: 0.25em 0.5em;
+  color: black;
+}
+ld56-menu-layout > .page-fragment > header > button:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+ld56-menu-layout > .page-fragment > header > button[name="btn-menu"]:after {
+  content: '\2BC7';
+  font-size: 1.8em;
+}
+ld56-menu-layout > .page-fragment > menu > button {
+  width: 100%;
+}
+ld56-menu-layout > .page-fragment fieldset {
+  border: 1px solid black;
+  background: rgba(255, 255, 255, 0.2);
+}
+ld56-menu-layout > .page-fragment fieldset > label > input {
+  width: 100%;
+}
+ld56-menu-layout > .page-fragment fieldset > label > input[type="number"] {
+  width: 33%;
+  min-width: 2.5em;
+  text-align: right;
+}
+ld56-menu-layout > .page-fragment fieldset > label :last-child {
+  min-width: unset;
+}
+ld56-menu-layout ld56-menu,
+ld56-menu-layout ld56-menu > menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+.dragging {
+  cursor: grabbing;
+}
+.gameOver.popup.modal {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: none;
+  border: none;
+  padding: 0;
+  box-sizing: border-box;
+  z-index: 0;
+  overflow: visible;
+  margin: 0;
+}
+.gameOver.popup.modal.show {
+  display: block;
+}
+.gameOver.popup.modal p.score > span:first-child:after {
+  content: ':';
+  margin-right: 0.25em;
+}
+.gameOver.popup.modal:before {
+  position: absolute;
+  left: -50dvw;
+  top: -50dvh;
+  z-index: -1;
+  content: '';
+  display: block;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  width: 100dvw;
+  height: 100dvh;
+}
+.gameOver.popup.modal [name="btn-menu"] {
+  width: auto;
+}
+.gameOver.popup.modal [name="btn-menu"] span {
+  display: initial;
+}
+.gameOver.popup.modal [name="btn-menu"]:before {
+  content: unset;
+}
+.gameOver.popup.modal > div {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%);
+  width: auto;
+  height: auto;
+  padding: 0.5em;
+  max-width: 27em;
+  gap: 0.5em;
+  border: none;
+  color: black;
+  z-index: 0;
+  text-align: center;
+  background: url(../public/assets/menu-middle.png);
+  background-size: 100%;
+  width: 23.375em;
+  padding: 0 3em;
+  box-sizing: border-box;
+}
+.gameOver.popup.modal > div:before {
+  content: '';
+  position: absolute;
+  bottom: 80%;
+  left: 0;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4/1;
+  background: url(../public/assets/menu-header.png) center top no-repeat;
+  background-size: contain;
+  z-index: -1;
+  pointer-events: none;
+}
+.gameOver.popup.modal > div:after {
+  content: '';
+  position: absolute;
+  top: 95%;
+  left: 0;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4/1;
+  background: url(../public/assets/menu-footer.png) center top no-repeat;
+  background-size: contain;
+  z-index: -1;
+  pointer-events: none;
+}
+audio {
+  display: none;
+}
+ld56-story {
+  display: flex;
+  flex-direction: column;
+  place-content: space-between;
+  background-image: url(../public/assets/menu-screen.png);
+  background-size: cover;
+  background-position: center bottom;
+  z-index: 0;
+  overflow: hidden;
+  place-items: center;
+}
+ld56-story > header {
+  display: flex;
+  flex-direction: row-reverse;
+  width: 100%;
+}
+ld56-story > header > h1 {
+  display: none;
+}
+ld56-story > header > button {
+  background: none;
+  border: none;
+  padding: 0.5em 1em;
+}
+ld56-story > header > button:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+ld56-story > header > button[name="btn-menu"]:after {
+  content: '\2261';
+  font-size: 2em;
+}
+ld56-story > fieldset {
+  z-index: 99;
+  margin: 5%;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  padding: 0.5em;
+  border: none;
+  width: 60em;
+  max-width: calc(100% - 1em);
+}
+ld56-story > fieldset > legend {
+  background: #000000;
+  position: relative;
+  top: 0;
+  left: -0.5em;
+  padding: 0.25em 0.5em;
+  box-sizing: border-box;
+}
+ld56-story > fieldset div.html:empty,
+ld56-story > fieldset p.text:empty {
+  display: none;
+}
+ld56-story > fieldset p:first-of-type {
+  margin-top: 0;
+}
+ld56-story:before {
+  display: block;
+  position: absolute;
+  right: 15%;
+  bottom: -10%;
+  content: '';
+  height: 80dvh;
+  aspect-ratio: 5/6;
+  background-image: url(../public/assets/menu-laddy.png);
+  background-size: cover;
+  background-position: center bottom;
+}

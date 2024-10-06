@@ -1,0 +1,29 @@
+templates:
+- id: builder
+  properties:
+    template: <entity>
+    spawnPosition: <vector3>
+    targetPosition: <vector3>
+  behaviour:
+    type: all
+    children:
+    - type: goto
+      position: =targetPosition
+    - type: construct
+      template: =template
+    - type: goto
+      property: =spawnPosition
+    - type: delete
+- id: mouse-trap
+  behaviour:
+     type: locateCreature
+     distance: 10
+     children:
+     - type: explode
+- id: shock-tower
+  behaviour: 
+    type: locateCreature
+    distance: 20
+    children:
+    - type: fire
+      visual: electric

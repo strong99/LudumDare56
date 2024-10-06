@@ -1,0 +1,74 @@
+<menu>
+    <button type="button" name="btn-menu"><span>menu</span></button>
+    <audio class="music" src="assets/danger.ogg" autoplay loop />
+</menu>
+
+
+<ul class="widget layer">
+    <li><button type="button" name="btn-layer-1" data-layer="0">1</button></li>
+    <li><button type="button" name="btn-layer-2" data-layer="1">2</button></li>
+    <li><button type="button" name="btn-layer-3" data-layer="2">3</button></li>
+</ul>
+
+<div class="canvas-wrapper">
+    <canvas></canvas>
+</div>
+
+<div class="buildmenu">
+    <menu class="stats">
+        <h1>stats</h1>
+        <div>
+            <label class="money">
+                <span class="label">Money</span>
+                <span class="value currency"></span>
+            </label>
+            <label class="kills">
+                <span class="label">Kills</span>
+                <span class="value"></span>
+            </label>
+            <label class="survival">
+                <span class="label">Survival</span>
+                <span class="value"></span>
+            </label>
+        </div>
+    </menu>
+    <menu class="units">
+        <h1>units</h1>
+        <div>
+            <button type="button" name="doctor">
+                <h2>doctor</h2>
+                <p>The doctor heals units</p>
+                <p>Cost: &euro; <span class="cost">5</span></p>
+            </button>
+            <button type="button" name="purger">
+                <h2>purger</h2>
+                <p>Uses a flamethrower</p>
+                <p>Cost: &euro; <span class="cost">6</span></p>
+            </button>
+        </div>
+    </menu>
+    <menu class="buildings">
+        <h1>constructions</h1>
+        <div>
+            <button type="button" name="mouse-trap">
+                <h2>trap</h2>
+                <p>Traps small creatures</p>
+                <p>Cost: &euro; <span class="cost">12</span></p>
+            </button>
+            <button type="button" name="shock-tower">
+                <h2>shock</h2>
+                <p>Shocks and damages those nearby</p>
+                <p>Cost: &euro; <span class="cost">40</span></p>
+            </button>
+        </div>
+    </menu>
+</div>
+
+<dialog class="gameOver popup modal">
+    <div class="content">
+        <h1>Game over</h1>
+        <p class="score"><span>score</span><span class="score"></span></p>
+        <p class="reason"></p>
+        <button name="btn-menu"><span>quit</span></button>
+    </div>
+</dialog>
