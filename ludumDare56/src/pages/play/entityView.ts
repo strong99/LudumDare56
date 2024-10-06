@@ -9,6 +9,9 @@ export class EntityView {
     private container?: Container;
     private sprite?: Sprite;
 
+    public get height() { return this.sprite!.height; }
+    public get width() { return this.sprite!.width; }
+
     public constructor(play: Play, entity: Entity, parentContainer: Container) {
         this.entity = entity;
         this.play = play;

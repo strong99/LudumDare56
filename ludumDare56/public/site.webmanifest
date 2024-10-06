@@ -1,0 +1,21 @@
+{
+  "name": "LD56 - The Plaguers",
+  "short_name": "plaguers",
+  "description": "A game made for the Ludum Dare 56 game creation competition. To create a game from scratch in 48 hours.",
+  "icons": [
+    {
+      "src": "icons/icon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/ld56/index.html",
+  "display": "fullscreen",
+  "theme_color": "#963917",
+  "background_color": "#1f1f32"
+}

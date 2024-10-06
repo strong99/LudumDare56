@@ -1,13 +1,13 @@
 import playTemplate from './play.html?raw'
 import { FragmentHTMLElement } from './fragment';
 import { createMenuLayout } from './menuLayout';
-import { Application, Assets, ColorMatrixFilter, Container, Sprite, Ticker } from 'pixi.js';
+import { Application, Assets, ColorMatrixFilter, Container, Sprite, Text, Ticker } from 'pixi.js';
 import { Entity } from '../models/entity';
-import { Game, GameOverState, State } from '../models/game';
+import { DamageEvent, Event, Game, GameOverState, State } from '../models/game';
 import * as game from '../services/gameManager';
 import { EntityView } from './play/entityView';
 import { WaypointView } from "./play/waypointDebugView";
-import { V2 } from '../math/vector2';
+import { V2, Vector2 } from '../math/vector2';
 import { AllBehaviourDTO } from '../models/behaviours/allBehaviour';
 import { V3, Vector3 } from '../math/vector3';
 import { GoToBehaviourDTO } from '../models/behaviours/goToBehaviour';
@@ -60,6 +60,7 @@ export class Play extends FragmentHTMLElement {
     private removeEntity: (entity: Entity) => void;
     private keydown: (args: KeyboardEvent) => void;
     private stateChanged: (args: State) => void;
+    private eventListener: (args: Event) => void;
 
     public constructor() {
         super();
@@ -293,6 +294,19 @@ export class Play extends FragmentHTMLElement {
                     spawnGoblinInterval += 45000;
                 }
             }
+
+            for (let x = this.particles.length - 1; x >= 0; --x) {
+                const particle = this.particles[x];
+                particle.duration -= ticker.deltaTime;
+                particle.node.position.set(
+                    particle.node.position.x + particle.direction.x * ticker.deltaTime,
+                    particle.node.position.y + particle.direction.y * ticker.deltaTime
+                );
+                if (particle.duration < 0) {
+                    particle.node.removeFromParent();
+                    this.particles.splice(x, 1);
+                }
+            }
         };
         this.addEntity = (entity: Entity) => {
             console.log('created entity');
@@ -309,6 +323,35 @@ export class Play extends FragmentHTMLElement {
         this.stateChanged = (_: State) => {
             this.handleState();
         }
+        this.eventListener = (event: Event) => {
+            if (event.type === 'damage') {
+                const damageEvent = event as DamageEvent;
+                console.log('event received: ', damageEvent.entity, damageEvent.damage);
+                const entity = this.game?.entities.find(x => x.id === damageEvent.entity);
+                const view = this.entities.find(x => x.is(entity));
+                if (!entity || !view) {
+                    return;
+                }
+                this.addDamageParticle(V3(entity.position.x, entity.position.y - view.height, entity.position.z), damageEvent.damage);
+            }
+        }
+    }
+
+    private particles: { duration: number; node: Container, direction: Vector2 }[] = [];
+    private addDamageParticle(position: Vector3, damage: number) {
+        const layerIdx = Math.ceil(position.z);
+        const layer = this._layers[layerIdx];
+        const text = new Text(`-${damage}`);
+        text.anchor.set(0.5, 1);
+        text.position.set(position.x, position.y);
+        text.zIndex = 999;
+        layer.addChild(text);
+
+        this.particles.push({
+            duration: 50,
+            node: text,
+            direction: V2(0, -2)
+        });
     }
 
     private handleState() {
@@ -318,7 +361,10 @@ export class Play extends FragmentHTMLElement {
         }
 
         const state = this.game.state;
-        if (state.type === 'gameOver') {
+        if (state.type === 'story') {
+            this.replaceWith(createStory());
+        }
+        else if (state.type === 'gameOver') {
             const gameOverState = state as Readonly<GameOverState>;
             const modal = this.querySelector('.gameOver.popup.modal') as HTMLDialogElement;
             if (!modal) {
@@ -444,6 +490,7 @@ export class Play extends FragmentHTMLElement {
         this.game.addEventListener('changed-state', this.stateChanged);
         this.game.addEventListener('created-entity', this.addEntity);
         this.game.addEventListener('deleted-entity', this.removeEntity);
+        this.game.addEventListener('event', this.eventListener);
 
         this.wrapper.addEventListener('pointerdown', this.pointerDown);
         this.wrapper.addEventListener('pointermove', this.pointerMove);
@@ -712,6 +759,7 @@ export class Play extends FragmentHTMLElement {
                                 {
                                     type: 'goto',
                                     position: '=targetPosition',
+                                    minDistance: 30,
                                     never: [WaypointType.nimble]
                                 } as GoToBehaviourDTO,
                                 {
@@ -723,25 +771,27 @@ export class Play extends FragmentHTMLElement {
                     } as HasPropertyBehaviourDTO,
                     {
                         type: 'inRange',
+                        max: 200,
+                        targets: ['mouse', 'rat', 'goblin'],
+                        toKey: 'target',
+                        child: {
+                            type: 'attack',
+                            fromKey: 'target',
+                            cooldown: 6,
+                            damage: 2
+                        } as AttackBehaviourDTO
+                    } as InRangeBehaviourDTO,
+                    {
+                        type: 'inRange',
                         max: 400,
                         targets: ['mouse', 'rat', 'goblin'],
                         toKey: 'target',
                         child: {
-                            type: 'all',
-                            children: [
-                                {
-                                    type: 'goto',
-                                    position: '=target',
-                                    never: [WaypointType.nimble]
-                                } as GoToBehaviourDTO,
-                                {
-                                    type: 'attack',
-                                    fromKey: 'target',
-                                    cooldown: 7,
-                                    damage: 5
-                                } as AttackBehaviourDTO
-                            ]
-                        } as AllBehaviourDTO
+                            type: 'goto',
+                            position: '=target',
+                            minDistance: 200,
+                            never: [WaypointType.nimble]
+                        } as GoToBehaviourDTO,
                     } as InRangeBehaviourDTO
                 ]
             } as AnyBehaviourDTO
@@ -777,8 +827,21 @@ export class Play extends FragmentHTMLElement {
                         duration: 100,
                         template: {
                             name: 'mouseTrap',
-                            position: V2().serialize(),
-                            properties: {}
+                            position: V3().serialize(),
+                            properties: {},
+                            hitpoints: 25,
+                            behaviour: {
+                                type: 'inRange',
+                                max: 100,
+                                targets: ['mouse', 'rat'],
+                                toKey: 'target',
+                                child: {
+                                    type: 'attack',
+                                    fromKey: 'target',
+                                    cooldown: 10,
+                                    damage: 3
+                                } as AttackBehaviourDTO
+                            } as InRangeBehaviourDTO,
                         }
                     } as ConstructBehaviourDTO,
                     {
@@ -823,8 +886,21 @@ export class Play extends FragmentHTMLElement {
                         duration: 100,
                         template: {
                             name: 'shockTower',
-                            position: V2().serialize(),
-                            properties: {}
+                            position: V3().serialize(),
+                            properties: {},
+                            hitpoints: 100,
+                            behaviour: {
+                                type: 'inRange',
+                                max: 200,
+                                targets: ['mouse', 'rat', 'goblin'],
+                                toKey: 'target',
+                                child: {
+                                    type: 'attack',
+                                    fromKey: 'target',
+                                    cooldown: 5,
+                                    damage: 2
+                                } as AttackBehaviourDTO
+                            } as InRangeBehaviourDTO,
                         }
                     } as ConstructBehaviourDTO,
                     {
@@ -842,11 +918,11 @@ export class Play extends FragmentHTMLElement {
 
     private updateBuyButton(type: string) {
         const template = (this.constructTemplates as any)[type];
-        const button = this.querySelector(`.buildmenu button[name="${type.replace(' ', '-') }"]`);
+        const button = this.querySelector(`.buildmenu button[name="${type.replace(' ', '-')}"]`);
         if (button && template) {
             button.querySelector('.cost')!.textContent = template.cost.toString();
             if (template.cost > this.game!.money && !this.game?.sandbox) {
-                button.setAttribute('disabled','disabled');
+                button.setAttribute('disabled', 'disabled');
             }
             else {
                 button.removeAttribute('disabled');
@@ -882,6 +958,7 @@ export class Play extends FragmentHTMLElement {
         this.game?.removeEventListener('created-entity', this.addEntity);
         this.game?.removeEventListener('deleted-entity', this.removeEntity);
         this.game?.removeEventListener('changed-state', this.stateChanged);
+        this.game?.removeEventListener('event', this.eventListener);
         this.wrapper?.removeEventListener('pointerdown', this.pointerDown);
         this.wrapper?.removeEventListener('pointermove', this.pointerMove);
         this.wrapper?.removeEventListener('pointerout', this.pointerOut);

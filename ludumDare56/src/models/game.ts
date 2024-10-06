@@ -10,6 +10,7 @@ export interface State {
 export interface StoryState {
     type: 'story';
     story: string;
+    followUp?: State;
 }
 
 export interface RunState {
@@ -28,9 +29,25 @@ export interface GameDTO {
     state: State;
     sandbox: boolean;
     editor: boolean;
+    story: boolean;
     money: number;
     kills?: number;
     duration: number;
+}
+
+export interface Event {
+    type: string;
+}
+
+export interface DamageEvent extends Event {
+    type: 'damage';
+    damage: number;
+    entity: number;
+}
+
+export interface DeathEvent extends Event {
+    type: 'death';
+    entity: number;
 }
 
 export class Game {
@@ -54,10 +71,15 @@ export class Game {
     }
     private _state: State;
 
+    public dispatchGameEvent(event: Event) {
+        this.dispatchEvent('event', event);
+    }
+
     public money: number;
     public kills: number;
+    public readonly story: boolean;
 
-    public constructor({ entities, modifiers, waypoints, sandbox, editor, money, kills, state, duration }: GameDTO) {
+    public constructor({ entities, modifiers, waypoints, sandbox, editor, money, kills, state, duration, story }: GameDTO) {
         this._entities = entities.map(x => new Entity(this, x));
         this._modifiers = modifiers.map(x => new Modifier(this, x));
         this._waypoints = waypoints.map(x => new Waypoint(this, x));
@@ -67,6 +89,7 @@ export class Game {
         this.kills = kills || 0;
         this._state = state;
         this.duration = duration;
+        this.story = story;
     }
 
     public addEntity(entity: Entity) {
@@ -122,6 +145,7 @@ export class Game {
     }
 
     private readonly listeners: { type: string, callback: (data: any) => void }[] = [];
+    public addEventListener(type: "event", callback: (data: Event) => void): void;
     public addEventListener(type: "changed-state", callback: (data: State) => void): void;
     public addEventListener(type: "created-entity", callback: (data: Entity) => void): void;
     public addEventListener(type: "deleted-entity", callback: (data: Entity) => void): void;
@@ -132,6 +156,7 @@ export class Game {
     public addEventListener(type: string, callback: (data: any) => void): void {
         this.listeners.push({type, callback});
     }
+    protected dispatchEvent(type: "event", data: Event): void;
     protected dispatchEvent(type: "changed-state", data: State): void;
     protected dispatchEvent(type: "created-entity", data: Entity): void;
     protected dispatchEvent(type: "deleted-entity", data: Entity): void;
@@ -163,7 +188,8 @@ export class Game {
             editor: this.editor,
             money: this.money, 
             kills: this.kills,
-            duration: this.duration
+            duration: this.duration,
+            story: this.story
         };
     }
 }

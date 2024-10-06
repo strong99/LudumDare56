@@ -1,5 +1,5 @@
 import { Entity } from "../entity";
-import { GameOverState } from "../game";
+import { GameOverState, StoryState } from "../game";
 import { Behaviour, BehaviourDTO, BehaviourResult } from "./behaviour";
 
 export interface GameOverBehaviourDTO extends BehaviourDTO {
@@ -24,10 +24,17 @@ export class GameOverBehaviour implements Behaviour {
     }
     public run(/*delta: number*/): BehaviourResult {
         console.log('game over behaviour');
-        this.owner.game.state = {
+
+        const gameOverState = {
             type: 'gameOver',
             reason: this.reason
         } as GameOverState;
+
+        this.owner.game.state = this.owner.game.story ? {
+            type: 'story',
+            story: 'outro',
+            followUp: gameOverState
+        } as StoryState : gameOverState;
         return BehaviourResult.succeeded;
     }
     public exit() {

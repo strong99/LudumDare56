@@ -34,7 +34,8 @@ export class Story extends FragmentHTMLElement {
         this.listen('[name="btn-next"]', 'click', () => {
             ++currentEntry;
             if (currentEntry >= activeStory.length) {
-                _game.state = {
+                const s = _game.state as StoryState;
+                _game.state = s && s.followUp ? { ...s.followUp } : {
                     type: 'run'
                 };
                 setTimeout(() => this.replaceWith(createPlay()), 0);

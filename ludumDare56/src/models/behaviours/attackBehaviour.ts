@@ -1,4 +1,5 @@
 import { Entity } from "../entity";
+import { DamageEvent, DeathEvent } from "../game";
 import { Behaviour, BehaviourDTO, BehaviourResult, getProperty } from "./behaviour";
 
 export interface AttackBehaviourDTO extends BehaviourDTO {
@@ -37,6 +38,8 @@ export class AttackBehaviour implements Behaviour {
         if (this.time > cooldown) {
             this.time -= cooldown;
 
+            console.log('attempt: target');
+
             const targetId = getProperty<number>(this.owner, this.fromKey);
             const targetValue = this.owner.properties[targetId];
             const target = this.owner.game.entities.find(x => x.id === targetValue);
@@ -44,9 +47,22 @@ export class AttackBehaviour implements Behaviour {
                 const damage = getProperty<number>(this.owner, this.damage);
                 target.hitpoints -= damage;
 
+                this.owner.game.dispatchGameEvent({
+                    type: 'damage',
+                    damage: damage,
+                    entity: target.id
+                } as DamageEvent);
+
+                console.log('attack: target', damage, target.hitpoints);
+
                 if (target.hitpoints === 0) {
                     this.owner.game.kills++;
                     this.owner.game.money += 2;
+                    this.owner.game.dispatchGameEvent({
+                        type: 'death',
+                        entity: target.id
+                    } as DeathEvent);
+                    this.owner.game.removeEntity(target);
                 }
 
                 return BehaviourResult.succeeded;

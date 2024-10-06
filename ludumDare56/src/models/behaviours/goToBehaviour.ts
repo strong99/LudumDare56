@@ -62,6 +62,7 @@ export class GoToBehaviour implements Behaviour {
     private next(): Vector3 | null {
         if (this.path && this.cachedTarget && !(this.cachedTarget?.position.equals(this.path[this.path.length - 1]))) {
             delete this.path;
+            return null;
         }
         if (!this.path) {
             let targetPosition = getProperty<Vector3|number>(this.owner, this.position);

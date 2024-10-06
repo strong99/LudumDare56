@@ -55,6 +55,7 @@ export function create({ editor, sandbox, story }: {
         waypoints,
         editor,
         sandbox,
+        story: story,
         duration: 0
     });
 }

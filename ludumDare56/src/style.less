@@ -87,6 +87,12 @@ ld56-play.page-fragment {
     width: 100dvw;
     height: 100dvh;
 
+    &:not([editor="true"]) {
+        .editor {
+            display: none;
+        }
+    }
+
     [name="btn-menu"] {
         padding: 0.5em;
         width: 2.5em;
@@ -154,6 +160,22 @@ ld56-play.page-fragment {
         border-bottom: 16px solid;
         border-image: url(../public/assets/borders-copper.png) 16 round;
         box-sizing: border-box;
+
+        > menu.editor > div {
+            max-height: calc(100% - 3.5em);
+            overflow: auto;
+            flex-direction: column;
+            text-align: left;
+            > p { margin: 0.25em 0;}
+            span.label {
+                font-weight: bolder;
+                &:after {
+                    content: ':';
+                    margin-right: 0.25em;
+                    margin-left: 0.1em;
+                }
+            }
+        }
 
         > menu {
             margin: 0;
@@ -230,9 +252,20 @@ ld56-play.page-fragment {
     z-index: 999;
     pointer-events: none;
     touch-action: none;
+    
+    place-content: center;
+    place-items: center;
 
     &.allowed {
         background-color: green;
+        place-items: end;
+    }
+    &:after {
+        content: 'x';
+        font-size: 2em;
+    }
+    &.allowed:after {
+        content: '\21E3';
     }
 }
 
