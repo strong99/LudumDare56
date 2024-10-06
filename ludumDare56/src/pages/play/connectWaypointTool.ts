@@ -1,19 +1,20 @@
+import { assertHTMLElement } from "../../exceptions";
 import { V2 } from "../../math/vector2";
 import { Game } from "../../models/game";
 import { Waypoint } from "../../models/waypoint";
 import { Play } from "../play";
 import { Tool } from "./tool";
-import { WaypointView } from "./waypointDebugView";
+import { WaypointDebugView } from "./waypointDebugView";
 
 export class ConnectWaypointTool implements Tool {
     private readonly play: Play;
-    private readonly debug?: WaypointView;
+    private readonly debug?: WaypointDebugView;
     private readonly pointerMove: (event: PointerEvent) => void;
     private readonly pointerUp: (event: PointerEvent) => void;
     private readonly pointerCancel: (event: PointerEvent) => void;
     private readonly cancelEvent: (event: KeyboardEvent) => void;
 
-    public constructor(play: Play, game: Game, waypoint: Waypoint, debug?: WaypointView) {
+    public constructor(play: Play, game: Game, waypoint: Waypoint, debug?: WaypointDebugView) {
         this.play = play;
         this.debug = debug;
 
@@ -41,24 +42,25 @@ export class ConnectWaypointTool implements Tool {
             this.play.setTool(null);
         }
         this.pointerCancel = (_: PointerEvent) => {
-            console.log('MoveWaypointTool::cancel');
             this.play.setTool(null);
         };
         this.cancelEvent = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
-                console.log('MoveWaypointTool::cancel');
                 this.play.setTool(null);
             }
         }
     }
+
     private canvas?: HTMLDivElement;
     public connectedCallback(): void {
+        this.canvas = assertHTMLElement(this.play.querySelector('.canvas-wrapper'), HTMLDivElement, 'unable to find the canvas wrapper');
         this.canvas = (this.play.querySelector('.canvas-wrapper') as HTMLDivElement);
         this.canvas.addEventListener('pointermove', this.pointerMove);
         this.canvas.addEventListener('pointerup', this.pointerUp);
         this.canvas.addEventListener('pointerout', this.pointerCancel);
         window.document.body.addEventListener('keydown', this.cancelEvent);
     }
+
     public disconnectedCallback(): void {
         this.canvas?.removeEventListener('pointermove', this.pointerMove);
         this.canvas?.removeEventListener('pointerup', this.pointerUp);

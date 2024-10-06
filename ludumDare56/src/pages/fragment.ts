@@ -30,10 +30,6 @@ export abstract class FragmentHTMLElement extends HTMLElement {
                 callback(args);
             };
 
-            if (!element) {
-                throw new Error(`Element not found: ${query}`);
-            }
-
             const eventCallback = { element: element, event: event, callback: overrideCallback };
 
             element.addEventListener(event, overrideCallback);

@@ -1,3 +1,5 @@
+import { IVector2 } from "../math/vector2";
+import { IVector3 } from "../math/vector3";
 import { Entity, EntityDTO } from "./entity";
 import { Modifier, ModifierDTO } from "./modifier";
 import { Waypoint, WaypointDTO } from "./waypoint";
@@ -37,6 +39,17 @@ export interface GameDTO {
 
 export interface Event {
     type: string;
+}
+
+export interface ParticleEvent extends Event {
+    type: 'particle';
+    id: string;
+    damage: number;
+    anchor?: IVector2;
+    direction?: IVector2;
+    position?: IVector3;
+    entity?: number;
+    duration: number;
 }
 
 export interface DamageEvent extends Event {

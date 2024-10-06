@@ -1,9 +1,9 @@
 import { Container, Graphics, Text } from "pixi.js";
-import { Play } from "../play";
-import { Game } from "../../models/game";
 import { Vector3 } from "../../math/vector3";
+import { Game } from "../../models/game";
+import { Play } from "../play";
 
-export class WaypointView {
+export class WaypointDebugView {
     private readonly graphics: Graphics[] = [];
     private readonly game: Game;
 
@@ -28,6 +28,10 @@ export class WaypointView {
             const done: Vector3[] = [];
             const textNodes = graphics.children.filter(x => x instanceof Text);
             const availableWaypoints = this.game.waypoints.filter(x => Math.ceil(x.position.z) === idx);
+            for (let i = availableWaypoints.length; i < graphics.children.length; ++i) {
+                graphics.children[i].removeFromParent();
+            }
+
             for (let i = 0; i < availableWaypoints.length; ++i) {
                 const waypoint = availableWaypoints[i];
 
@@ -55,12 +59,12 @@ export class WaypointView {
                         continue;
                     }
 
-                    const layerIdx = Math.max(waypoint.position.z, neighbour.z);
+                    const layerIdx = Math.ceil(Math.max(waypoint.position.z, neighbour.z));
 
-                    graphics.lineStyle(size, colour[layerIdx], 3);
+                    graphics.beginPath();
                     graphics.moveTo(waypoint.position.x, waypoint.position.y)
                         .lineTo(neighbour.x, neighbour.y)
-                        .stroke();
+                        .stroke({ width: 2, color: colour[layerIdx], alpha: 3 });
                 }
             }
         }

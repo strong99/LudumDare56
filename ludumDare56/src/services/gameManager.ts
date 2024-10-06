@@ -1,8 +1,8 @@
-import waypointsFile from "./waypoints.json";
-import { Game, GameDTO, StoryState } from "../models/game";
-import * as storage from "./storageService";
 import { EqualsBehaviourDTO } from "../models/behaviours/equalsBehaviour";
 import { GameOverBehaviourDTO } from "../models/behaviours/gameOverBehaviour";
+import { Game, GameDTO, StoryState } from "../models/game";
+import * as storage from "./storageService";
+import waypointsFile from "./waypoints.json";
 
 const gameSaveKey = "ld56:save";
 let _game: Game | null = null;
@@ -20,9 +20,10 @@ export function save(): void {
 }
 
 export function create({ editor, sandbox, story }: {
-    sandbox: boolean,
-    editor: boolean,
-    story: boolean
+    playerName: string;
+    sandbox: boolean;
+    editor: boolean;
+    story: boolean;
 }): Game {
     const waypoints = waypointsFile;
 

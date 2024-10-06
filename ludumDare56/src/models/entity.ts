@@ -1,8 +1,8 @@
 import { clamp, JsonValue } from "../math/utils";
-import { V3, IVector3, Vector3 } from "../math/vector3";
+import { IVector3, V3, Vector3 } from "../math/vector3";
 import { Behaviour, BehaviourDTO, BehaviourResult } from "./behaviours/behaviour";
 import { CreateBehaviour } from "./behaviours/behaviourFactory";
-import { Game } from "./game";
+import { DeathEvent, Game } from "./game";
 
 export interface EntityDTO {
     id?: number;
@@ -52,6 +52,14 @@ export class Entity {
             if (this.behaviour.run(delta) !== BehaviourResult.active) {
                 this.behaviour.exit();
             }
+        }
+
+        if (this.hitpoints === 0) {
+            this.game.dispatchGameEvent({
+                type: 'death',
+                entity: this.id
+            } as DeathEvent);
+            this.game.removeEntity(this);
         }
     }
 

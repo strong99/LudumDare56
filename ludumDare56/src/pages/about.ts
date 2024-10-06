@@ -3,7 +3,7 @@ import { FragmentHTMLElement } from './fragment';
 import { createMenu } from './menu';
 
 const aboutElementName = "ld56-about";
-export class About extends FragmentHTMLElement {
+class About extends FragmentHTMLElement {
     public get name(): string { return "about"; }
 
     public connectedCallback(): void {

@@ -1,10 +1,10 @@
-import settingsTemplate from './settings.html?raw'
-import { Menu } from './menu';
 import { SettingsManager } from '../services/settingsManager';
 import { FragmentHTMLElement } from './fragment';
+import { createMenu } from './menu';
+import settingsTemplate from './settings.html?raw';
 
 const settingsElementName = "ld56-settings";
-export class Settings extends FragmentHTMLElement {
+class Settings extends FragmentHTMLElement {
     private settingsManager = new SettingsManager();
 
     public get name(): string { return "settings"; }
@@ -38,7 +38,7 @@ export class Settings extends FragmentHTMLElement {
         this.innerHTML = settingsTemplate;
 
         this.listenOnce('[name="btn-menu"]', 'click', () => {
-            this.replaceWith(new Menu());
+            this.replaceWith(createMenu());
         });
 
         this.initInputPercentageGroup('[name="all-volume-range"],[name="all-volume-box"]', this.settingsManager, 'allVolume');

@@ -1,7 +1,7 @@
-import menuTemplate from './menuLayout.html?raw';
+import { SettingsManager } from '../services/settingsManager';
 import { FragmentHTMLElement } from './fragment';
 import { createMenu } from './menu';
-import { SettingsManager } from '../services/settingsManager';
+import menuTemplate from './menuLayout.html?raw';
 
 const menuLayoutElementName = "ld56-menu-layout";
 class MenuLayout extends FragmentHTMLElement {

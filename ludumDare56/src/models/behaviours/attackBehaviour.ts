@@ -1,5 +1,6 @@
+import { IVector2 } from "../../math/vector2";
 import { Entity } from "../entity";
-import { DamageEvent, DeathEvent } from "../game";
+import { DamageEvent, ParticleEvent } from "../game";
 import { Behaviour, BehaviourDTO, BehaviourResult, getProperty } from "./behaviour";
 
 export interface AttackBehaviourDTO extends BehaviourDTO {
@@ -7,6 +8,14 @@ export interface AttackBehaviourDTO extends BehaviourDTO {
     cooldown: number;
     damage: number;
     fromKey: string;
+    particle?: AttackParticleDTO;
+}
+
+interface AttackParticleDTO { 
+    id: string;
+    duration: number;
+    position: IVector2;
+    entity?: 'self' | 'target';
 }
 
 export class AttackBehaviour implements Behaviour {
@@ -16,6 +25,7 @@ export class AttackBehaviour implements Behaviour {
     private readonly cooldown: number|string;
     private readonly damage: number | string;
     private readonly fromKey: string;
+    private readonly particle?: AttackParticleDTO;
     private time: number = 0;
 
     public constructor(entity: Entity, data: AttackBehaviourDTO) {
@@ -24,6 +34,7 @@ export class AttackBehaviour implements Behaviour {
         this.cooldown = data.cooldown;
         this.damage = data.damage;
         this.fromKey = data.fromKey;
+        this.particle = data.particle;
     }
 
     public enter() {
@@ -47,6 +58,15 @@ export class AttackBehaviour implements Behaviour {
                 const damage = getProperty<number>(this.owner, this.damage);
                 target.hitpoints -= damage;
 
+                if (this.particle) {
+                    this.owner.game.dispatchGameEvent({
+                        type: 'particle',
+                        id: this.particle.id,
+                        duration: this.particle.duration,
+                        position: this.particle.position,
+                        entity: this.particle.entity === 'self' ? this.owner.id : this.particle.entity === 'target' ? target.id : undefined
+                    } as ParticleEvent);
+                }
                 this.owner.game.dispatchGameEvent({
                     type: 'damage',
                     damage: damage,
@@ -58,11 +78,6 @@ export class AttackBehaviour implements Behaviour {
                 if (target.hitpoints === 0) {
                     this.owner.game.kills++;
                     this.owner.game.money += 2;
-                    this.owner.game.dispatchGameEvent({
-                        type: 'death',
-                        entity: target.id
-                    } as DeathEvent);
-                    this.owner.game.removeEntity(target);
                 }
 
                 return BehaviourResult.succeeded;

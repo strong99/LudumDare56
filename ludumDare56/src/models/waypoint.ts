@@ -1,4 +1,4 @@
-import { V3, IVector3, Vector3 } from "../math/vector3";
+import { IVector3, V3, Vector3 } from "../math/vector3";
 import { Game } from "./game";
 
 export enum WaypointType {

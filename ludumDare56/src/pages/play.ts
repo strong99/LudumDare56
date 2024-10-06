@@ -1,45 +1,47 @@
-import playTemplate from './play.html?raw'
-import { FragmentHTMLElement } from './fragment';
-import { createMenuLayout } from './menuLayout';
 import { Application, Assets, ColorMatrixFilter, Container, Sprite, Text, Ticker } from 'pixi.js';
-import { Entity } from '../models/entity';
-import { DamageEvent, Event, Game, GameOverState, State } from '../models/game';
-import * as game from '../services/gameManager';
-import { EntityView } from './play/entityView';
-import { WaypointView } from "./play/waypointDebugView";
+import { clamp } from '../math/utils';
 import { V2, Vector2 } from '../math/vector2';
-import { AllBehaviourDTO } from '../models/behaviours/allBehaviour';
 import { V3, Vector3 } from '../math/vector3';
-import { GoToBehaviourDTO } from '../models/behaviours/goToBehaviour';
+import { AllBehaviourDTO } from '../models/behaviours/allBehaviour';
+import { AnyBehaviourDTO } from '../models/behaviours/anyBehaviour';
+import { AttackBehaviourDTO } from '../models/behaviours/attackBehaviour';
+import { ClearPropertyBehaviourDTO } from '../models/behaviours/clearPropertyBehaviour';
 import { ConstructBehaviourDTO } from '../models/behaviours/constructBehaviour';
 import { DeleteBehaviourDTO } from '../models/behaviours/deleteBehaviour';
-import { Waypoint, WaypointType } from '../models/waypoint';
-import { Tool } from './play/tool';
-import { MoveWaypointTool } from './play/moveWaypointTool';
-import { ConnectWaypointTool } from './play/connectWaypointTool';
-import { PlaceOnPathTool } from './play/placeOnPathTool';
-import { clamp } from '../math/utils';
-import { AttackBehaviourDTO } from '../models/behaviours/attackBehaviour';
-import { InRangeBehaviourDTO } from '../models/behaviours/inRangeBehaviour';
-import { AnyBehaviourDTO } from '../models/behaviours/anyBehaviour';
+import { GoToBehaviourDTO } from '../models/behaviours/goToBehaviour';
 import { HasPropertyBehaviourDTO } from '../models/behaviours/hasPropertyBehaviour';
-import { ClearPropertyBehaviourDTO } from '../models/behaviours/clearPropertyBehaviour';
+import { InRangeBehaviourDTO } from '../models/behaviours/inRangeBehaviour';
+import { Entity } from '../models/entity';
+import { DamageEvent, Event, Game, GameOverState, ParticleEvent, State } from '../models/game';
+import { Waypoint, WaypointType } from '../models/waypoint';
+import * as game from '../services/gameManager';
 import { SettingsManager } from '../services/settingsManager';
+import { FragmentHTMLElement } from './fragment';
+import { createMenuLayout } from './menuLayout';
+import playTemplate from './play.html?raw';
+import { ConnectWaypointTool } from './play/connectWaypointTool';
+import { EntityView } from './play/entityView';
+import { MoveWaypointTool } from './play/moveWaypointTool';
+import { PlaceOnPathTool } from './play/placeOnPathTool';
+import { Tool } from './play/tool';
+import { WaypointDebugView } from "./play/waypointDebugView";
 import { createStory } from './story';
 
 const playElementName = "ld56-play";
 export class Play extends FragmentHTMLElement {
     public get name(): string { return "play"; }
+
     public get layers(): readonly Container[] { return this._layers; }
-    private visuals?: Application;
     private _layers: Container[] = [];
+
+    private visuals?: Application;
     private game?: Game | null;
     private sky?: Sprite;
 
     private wrapper?: HTMLDivElement;
 
     private entities: EntityView[] = [];
-    private debugWaypoints?: WaypointView;
+    private debugWaypoints?: WaypointDebugView;
     private tool?: Tool;
 
     private scrollHorizontale: number = 0;
@@ -297,11 +299,15 @@ export class Play extends FragmentHTMLElement {
 
             for (let x = this.particles.length - 1; x >= 0; --x) {
                 const particle = this.particles[x];
+
+                if (particle.direction) {
+                    particle.node.position.set(
+                        particle.node.position.x + particle.direction.x * ticker.deltaTime,
+                        particle.node.position.y + particle.direction.y * ticker.deltaTime
+                    );
+                }
+
                 particle.duration -= ticker.deltaTime;
-                particle.node.position.set(
-                    particle.node.position.x + particle.direction.x * ticker.deltaTime,
-                    particle.node.position.y + particle.direction.y * ticker.deltaTime
-                );
                 if (particle.duration < 0) {
                     particle.node.removeFromParent();
                     this.particles.splice(x, 1);
@@ -334,10 +340,15 @@ export class Play extends FragmentHTMLElement {
                 }
                 this.addDamageParticle(V3(entity.position.x, entity.position.y - view.height, entity.position.z), damageEvent.damage);
             }
+            else if (event.type === 'particle') {
+                const particleEvent = event as ParticleEvent;
+                console.log('event received: ', particleEvent);
+                this.addParticle(particleEvent);
+            }
         }
     }
 
-    private particles: { duration: number; node: Container, direction: Vector2 }[] = [];
+    private particles: { duration: number; node: Container, direction?: Vector2 }[] = [];
     private addDamageParticle(position: Vector3, damage: number) {
         const layerIdx = Math.ceil(position.z);
         const layer = this._layers[layerIdx];
@@ -351,6 +362,40 @@ export class Play extends FragmentHTMLElement {
             duration: 50,
             node: text,
             direction: V2(0, -2)
+        });
+    }
+    private async addParticle(particleEvent: ParticleEvent) {
+        const texture = await Assets.load(`/assets/${particleEvent.id}.png`);
+        const text = new Sprite(texture);
+
+        let position = particleEvent.position ?? V3();
+        if (particleEvent.entity) {
+            const entity = this.game?.entities.find(x => x.id === particleEvent.entity);
+            const view = this.entities.find(x => x.is(entity));
+            if (entity && view) {
+                position = V3(particleEvent.position);
+                console.log('add to sprite: ', position);
+                view.visual?.addChild(text);
+            }
+        }
+        if (!text.parent && !particleEvent.entity && typeof position.z !== 'undefined') {
+            const layerIdx = Math.ceil(position.z);
+            console.log(layerIdx, position.z);
+            const layer = this._layers[layerIdx];
+            layer.addChild(text);
+        }
+        text.position.set(position.x, position.y);
+
+        if (particleEvent.anchor) {
+            text.anchor.set(particleEvent.anchor.x, particleEvent.anchor.y);
+        }
+
+        text.zIndex = 999;
+
+        this.particles.push({
+            duration: 50,
+            node: text,
+            direction: particleEvent.direction ? V2(particleEvent.direction) : undefined
         });
     }
 
@@ -454,7 +499,7 @@ export class Play extends FragmentHTMLElement {
             background: '#1099bb'
         });
         await Assets.init({
-            basePath: 'ldjam56/'
+            basePath: 'ld56/'
         });
 
         const skyAsset = await Assets.load('/assets/sky.png');
@@ -518,7 +563,7 @@ export class Play extends FragmentHTMLElement {
         }
 
         if (this.getAttribute('editor') === 'true') {
-            this.debugWaypoints = new WaypointView(this, this.game, this.visuals.stage);
+            this.debugWaypoints = new WaypointDebugView(this, this.game, this.visuals.stage);
         }
         this.hideLayersBefore(this.layerIdx);
 
@@ -776,6 +821,13 @@ export class Play extends FragmentHTMLElement {
                         toKey: 'target',
                         child: {
                             type: 'attack',
+                            particle: {
+                                id: 'purger-flamethrower',
+                                duration: 10,
+                                anchor: { x: 0.1, y: 0.1 },
+                                position: { x: 40, y: -120 },
+                                entity: 'self'
+                            },
                             fromKey: 'target',
                             cooldown: 6,
                             damage: 2

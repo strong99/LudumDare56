@@ -1,11 +1,13 @@
 import { Assets, Container, Sprite } from "pixi.js";
+import { V2, Vector2 } from "../../math/vector2";
 import { Entity } from "../../models/entity";
 import { Play } from "../play";
-import { V2, Vector2 } from "../../math/vector2";
 
 export class EntityView {
     private readonly entity: Entity;
     private readonly play: Play;
+
+    public get visual(): Container | null { return this.container ?? null; }
     private container?: Container;
     private sprite?: Sprite;
 
@@ -22,7 +24,6 @@ export class EntityView {
             this.sprite.scale.set(0.5);
             this.sprite.anchor.set(0.5, 0.9);
 
-            //this.container.addChild(this.sprite);
             this.container = this.sprite;
             parentContainer.addChild(this.container);
         });
@@ -50,7 +51,6 @@ export class EntityView {
                 this.sprite.scale.x *=-1;
             }
             
-
             const expectedLayerIdx = Math.ceil(this.entity.position.z);
             const currentLayerIds = this.play.layers.indexOf(this.sprite.parent)
             if (expectedLayerIdx !== currentLayerIds) {

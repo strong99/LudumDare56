@@ -1,11 +1,12 @@
 import { Container } from "pixi.js";
 import { lineOnLineIntersection } from "../../math/utils";
 import { V2, Vector2 } from "../../math/vector2";
-import { Vector3, V3 } from "../../math/vector3";
-import { Play } from "../play";
-import { Tool } from "./tool";
+import { V3, Vector3 } from "../../math/vector3";
 import { Game } from "../../models/game";
 import { WaypointType } from "../../models/waypoint";
+import { Play } from "../play";
+import { Tool } from "./tool";
+import { assertHTMLElement } from "../../exceptions";
 
 export class PlaceOnPathTool implements Tool {
     private readonly play: Play;
@@ -103,11 +104,14 @@ export class PlaceOnPathTool implements Tool {
     }
     private canvas?: HTMLDivElement;
     public connectedCallback(): void {
-        this.canvas = (this.play.querySelector('.canvas-wrapper') as HTMLDivElement);
+        this.canvas = assertHTMLElement(this.play.querySelector('.canvas-wrapper'), HTMLDivElement, 'unable to find the canvas wrapper');
         this.canvas.addEventListener('pointerdown', this.placeEvent);
+
         this.placeholder = document.createElement('div') as HTMLDivElement;
         this.placeholder.classList.add('placeholder');
+
         document.body.appendChild(this.placeholder);
+
         window.document.body.addEventListener('pointermove', this.pointerMove);
         window.document.body.addEventListener('keydown', this.cancelEvent);
 

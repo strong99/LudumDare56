@@ -1,10 +1,11 @@
-import storyTemplate from './story.html?raw'
-import { FragmentHTMLElement } from './fragment';
-import stories from './stories.json';
+import { StoryState } from '../models/game';
 import * as game from '../services/gameManager';
+import { SettingsManager } from "../services/settingsManager";
+import { FragmentHTMLElement } from './fragment';
 import { createMenuLayout } from './menuLayout';
 import { createPlay } from './play';
-import { StoryState } from '../models/game';
+import stories from './stories.json';
+import storyTemplate from './story.html?raw';
 
 const storyElementName = "ld56-story";
 export class Story extends FragmentHTMLElement {
@@ -12,6 +13,12 @@ export class Story extends FragmentHTMLElement {
 
     public connectedCallback(): void {
         this.innerHTML = storyTemplate;
+
+        const audios = this.querySelectorAll('audio');
+        const settingsManager = new SettingsManager();
+        for (const audio of audios) {
+            audio.volume = (audio.classList.contains('music') ? settingsManager.musicVolume : settingsManager.effectVolume) * settingsManager.allVolume;
+        }
 
         const _game = game.get();
         if (!_game) {

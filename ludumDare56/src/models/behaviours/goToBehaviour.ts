@@ -1,4 +1,4 @@
-import { Vector3, V3 } from "../../math/vector3";
+import { V3, Vector3 } from "../../math/vector3";
 import { generatePathFromOutsidePath } from "../../services/pathfinder";
 import { Entity } from "../entity";
 import { WaypointType } from "../waypoint";

@@ -1,13 +1,13 @@
-import menuTemplate from './menu.html?raw'
+import * as game from '../services/gameManager';
+import { createAbout } from './about';
+import { FragmentHTMLElement } from './fragment';
+import { createLobby } from './lobby';
+import menuTemplate from './menu.html?raw';
 import { createPlay } from './play';
 import { createSettings } from './settings';
-import { createLobby } from './lobby';
-import * as game from '../services/gameManager';
-import { FragmentHTMLElement } from './fragment';
-import { createAbout } from './about';
 
 const menuElementName = "ld56-menu";
-export class Menu extends FragmentHTMLElement {
+class Menu extends FragmentHTMLElement {
     public get name(): string { return "menu"; }
 
     public connectedCallback(): void {
@@ -27,7 +27,6 @@ export class Menu extends FragmentHTMLElement {
         this.listenOnce('[name="btn-about"]', 'click', () => this.replaceWith(createAbout()));
     }
 }
-
 
 let defined = false;
 export function createMenu() {
